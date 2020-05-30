@@ -10,6 +10,16 @@ import paho.mqtt.client as mqtt
 
 logger = logging.getLogger(__name__)
 
+if os.environ.get("DEBUG"):
+    import ptvsd
+    ptvsd_port = os.environ.get("CHASGIMQTT_PORT_PTVSD", 5679)
+    try:
+        ptvsd.enable_attach(address=("0.0.0.0", ptvsd_port))
+        print("Started ptvsd at port %s." % ptvsd_port)
+    except OSError:
+        print("ptvsd port %s already in use." % ptvsd_port)
+        ptvsd.enable_attach(address = ('0.0.0.0', 3000))
+
 async def mqtt_send(future, channel_layer, channel, event):
     result = await channel_layer.send(channel, event)
     future.set_result(result)
