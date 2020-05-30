@@ -160,13 +160,18 @@ class Server(object):
 
             if not isinstance(payload, dict):
                 payload = json.loads(payload)
+            
+            try:
+                body = float(payload["payload"])
+            except:
+                body = json.dumps(payload['payload'])
 
             logger.info("Receive a menssage with payload:\r\n%s", msg)
             self.client.publish(
                     payload['topic'], 
-                    payload['payload'], 
-                    qos=payload.get('qos', 2), 
-                    retain=False)
+                    payload=body, 
+                    qos=int(payload.get('qos', 2)), 
+                    retain=payload.get('retain', False))
 
 
     async def client_pool_message(self):
